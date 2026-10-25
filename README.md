@@ -166,7 +166,3 @@ Latest verified local checkpoint: **54 Python tests passed** and the frontend pr
 - Document ingestion with verifiable provenance
 - More extensive validation, frontend tests, and end-to-end tests
 - CI, monitoring, dependency scanning, and deployment hardening
-
----
-
-**Built to explore practical, evidence-first AI systems and accountable enterprise workflows.**
