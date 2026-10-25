@@ -1,137 +1,109 @@
 # CoverageOps AI
 
-### Evidence-first insurance intelligence · Multi-agent workflows · Human-in-the-loop review
+**Evidence-first insurance workflow intelligence · Multi-agent orchestration · Human-in-the-loop review**
 
-CoverageOps AI is a full-stack insurance operations platform prototype that evaluates structured policy information against contractual coverage requirements, identifies coverage gaps, and coordinates human review.
+CoverageOps AI is a full-stack engineering prototype for insurance operations. It evaluates structured policy information against contractual coverage requirements, identifies coverage gaps, tracks agent results, and supports human-review handoffs with persisted workflow events.
 
-The project demonstrates how agent-oriented architecture, deterministic validation, workflow orchestration, and persistent audit records can work together in a high-stakes domain where accuracy, traceability, and human oversight matter.
+> **Project status:** Local development prototype using **synthetic insurance data**. The public GitHub repository contains source code, not a hosted service. The API is **not production-secure** and should not be exposed publicly without authentication, authorization, and deployment hardening.
 
-**Status:** Working local prototype using synthetic insurance data.
+## Product screenshots
 
-## Product Preview
+### Operations overview — demo mode
 
-CoverageOps AI includes an operational dashboard with:
+Sample metrics and insurance examples are explicitly marked as illustrative. They are **not** retrieved from PostgreSQL.
 
-- **Operations Overview** — workflow status, agent activity, pending reviews, and customer follow-ups.
-- **AI Agent Performance** — visibility into policy analysis, coverage comparison, and evaluation stages.
-- **Human Reviews** — workflow handoffs and recorded specialist decisions.
-- **Coverage Findings** — structured policy discrepancies and supporting workflow evidence.
-- **Live / Demo Mode** — distinguishes PostgreSQL-backed workflow information from illustrative sample data.
-- **Customer Onboarding** — creates workflows through the FastAPI backend.
+![CoverageOps AI Operations Overview in demo mode, including sample workflow metrics and a one-million-dollar insurance coverage discrepancy](assets/screenshots/overview-demo.webp)
 
-The dashboard is designed to surface actionable findings rather than treating AI-generated output as a final insurance determination.
+### Operations overview — live backend
 
-## Example: Detecting a Coverage Gap
+The dashboard loads a selected workflow through the Next.js API proxy and FastAPI. Live workflow metrics and stored results are backed by PostgreSQL.
 
-A synthetic logistics customer submits structured General Liability insurance information.
+![CoverageOps AI live overview showing three workflows, three recorded agent events, no pending specialist reviews, and one case awaiting customer action](assets/screenshots/overview-live.webp)
 
-| Coverage attribute | Value |
-|---|---|
-| Policy limit | $1,000,000 |
-| Contractual requirement | $2,000,000 |
-| Identified shortfall | $1,000,000 |
-| Result | Below requirement |
-| Specialist decision | Request changes |
-| Workflow status | Awaiting customer |
+### Customer onboarding
 
-The coverage comparison identifies the deficiency, records its finding, and routes the case through the human-review workflow.
+The new-workflow form uses the existing FastAPI onboarding endpoint to create a workflow record.
 
-The reviewer decision and associated workflow events remain available for traceability.
+![New customer onboarding modal for a synthetic Northstar Logistics case](assets/screenshots/new-customer-onboarding.webp)
+
+### AI agent performance
+
+An execution pipeline shows policy analysis, coverage comparison, evaluation, and human review, alongside findings and evidence-related workflow records.
+
+![AI Agent Performance dashboard with the policy analysis pipeline and coverage findings](assets/screenshots/ai-agent-performance.webp)
+
+## What it demonstrates
+
+- **Workflow orchestration:** Customer onboarding and persisted insurance workflow state.
+- **Structured coverage comparison:** Numeric checks against contractual policy requirements.
+- **Agent result visibility:** Recorded policy, comparison, and evaluation stages.
+- **Human oversight:** Review requests and specialist decisions stored with workflow state.
+- **Traceability:** Database-backed workflow events, findings, and review handoffs.
+- **Live vs. demo transparency:** The UI explicitly distinguishes real backend responses from sample data.
+
+## Example: Northstar Logistics (synthetic)
+
+| General liability finding | Amount |
+|---|---:|
+| Reported policy limit | $1,000,000 |
+| Required minimum | $2,000,000 |
+| Calculated shortfall | **$1,000,000** |
+
+The specialist requested changes, and the saved case progressed to **awaiting customer**. This is a demonstration of a structured coverage comparison, **not** a certified determination of insurance coverage.
 
 ## Architecture
 
 ```text
-Next.js Dashboard
-       |
-       v
-Next.js API Proxy
-       |
-       v
-FastAPI Backend
-       |
-       v
-Workflow Orchestration
-       |
-       +-- Policy Agent
-       |
-       +-- Coverage Comparison
-       |
-       +-- Policy Evaluation
-       |
-       v
-Human Review / Decision
-       |
-       v
-PostgreSQL
-       |
-       +-- Customer Workflows
-       +-- Agent Results
-       +-- Coverage Findings
-       +-- Review Handoffs
-       +-- Workflow Events
+Next.js dashboard (React / TypeScript)
+    |
+    v
+Next.js API proxy
+    |
+    v
+FastAPI application
+    |
+    +-- Customer onboarding / workflow orchestration
+    +-- Policy agent and policy validation
+    +-- Coverage comparison
+    +-- Policy evaluation
+    +-- Human review handoff / recorded decision
+    |
+    v
+SQLAlchemy + PostgreSQL
+    +-- Workflows and events
+    +-- Findings / agent results
+    +-- Review records
 ```
 
-## Technology Stack
+## Stack
 
-| Layer | Technologies |
+| Layer | Technology |
 |---|---|
-| Frontend | Next.js, React, TypeScript |
-| Backend | Python, FastAPI |
-| Database | PostgreSQL, SQLAlchemy |
-| Schema migrations | Alembic |
-| Testing | Pytest |
-| Infrastructure | Docker Compose |
-| Local AI experimentation | Ollama integration |
-| Version control | Git, GitHub |
+| UI | Next.js, React, TypeScript |
+| API | Python, FastAPI |
+| Data | PostgreSQL, SQLAlchemy, Alembic |
+| Tests | Pytest |
+| Local infrastructure | Docker Compose |
+| Agent experimentation | Ollama integration in the broader codebase |
 
-The repository also contains experimental agent and memory components. Their presence should not be interpreted as proof that every insurance evaluation uses a live language-model inference.
+**Implementation note:** The presence of Ollama integration does not establish that every insurance result is produced by an LLM. Structured policy comparisons and agent stages should be evaluated on their actual implementation.
 
-## Engineering Principles
-
-**Accuracy before automation.** Structured numerical comparisons establish coverage shortfalls without relying on an LLM to perform basic arithmetic.
-
-**Human oversight.** Cases requiring judgment support review handoffs and recorded decisions.
-
-**Traceability.** Workflow events, agent outputs, and findings are persisted so results can be investigated after execution.
-
-**Transparent presentation.** Demo data is explicitly distinguished from live backend data.
-
-**Separation of concerns.** Frontend presentation, API routing, business logic, persistence, and tests are organized into separate components.
-
-## Repository Structure
+## Repository layout
 
 ```text
-CoverageOps-AI/
-├── app/
-│   ├── agents/
-│   ├── core/
-│   ├── coverage/
-│   │   ├── agents/
-│   │   ├── services/
-│   │   └── dashboard_router.py
-│   ├── db/
-│   └── main.py
-├── coverageops-dashboard/
-│   └── src/app/
-├── alembic/
-├── tests/
-├── docker-compose.yml
-├── requirements.txt
-└── alembic.ini
+app/                     # FastAPI, workflow services, models, and agents
+coverageops-dashboard/   # Next.js application and API proxy
+alembic/                 # Schema migrations
+tests/                   # Python test suite
+docker-compose.yml       # Local supporting services
+requirements.txt         # Python dependencies
 ```
 
-## Local Development
-
-### Requirements
-
-- Python with a compatible environment
-- Node.js and npm
-- PostgreSQL
-- Docker and Docker Compose
+## Local setup
 
 ### Backend
 
-From the repository root, create a Python virtual environment and install dependencies:
+Use a compatible Python version, create a virtual environment, and install dependencies:
 
 ```powershell
 python -m venv .venv
@@ -139,7 +111,7 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-Configure the database environment variables expected by the backend, start PostgreSQL, and apply the Alembic migrations according to your local configuration.
+Configure the database using the project's local environment settings. Start PostgreSQL with the supplied Docker Compose configuration and apply the Alembic migrations after confirming the database connection string and target database. Do **not** run migrations against a database containing important information without checking the configuration.
 
 Start FastAPI:
 
@@ -147,15 +119,12 @@ Start FastAPI:
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8002
 ```
 
-API documentation:
-
-`http://127.0.0.1:8002/docs`
-
-Health endpoint:
-
-`http://127.0.0.1:8002/health`
+- API documentation: `http://127.0.0.1:8002/docs`
+- Health endpoint: `http://127.0.0.1:8002/health`
 
 ### Frontend
+
+Open a second terminal:
 
 ```powershell
 cd coverageops-dashboard
@@ -163,56 +132,41 @@ npm ci
 npm run dev
 ```
 
-The dashboard uses port **3001** in the current development configuration.
+The frontend is configured for `http://localhost:3001` in the current project. Its API proxy uses `BACKEND_URL` if configured, otherwise the local FastAPI URL `http://127.0.0.1:8002`. **Do not point the proxy to a publicly exposed, unauthenticated backend.**
 
-The Next.js proxy expects the FastAPI backend at `http://127.0.0.1:8002` by default, configurable through `BACKEND_URL`.
+### Verification
 
-### Tests
-
-Run from the repository root:
+From the repository root:
 
 ```powershell
 python -m pytest -q
 ```
 
-**Latest verified local result:** 54 passed, 1 dependency deprecation warning.
-
-Build the frontend:
+From `coverageops-dashboard/`:
 
 ```powershell
-cd coverageops-dashboard
 npm run build
 ```
 
-The production build completed successfully during local verification.
+Latest verified local checkpoint: **54 Python tests passed** and the frontend production build completed. These checks do **not** constitute a security audit or end-to-end production certification.
 
-## Security and Responsible Use
+## Security and limitations
 
-CoverageOps AI is a development prototype built for educational, research, and portfolio demonstration purposes.
+- **Synthetic/demo data only.** Do not submit real policyholder data or credentials.
+- **Not production-ready.** Authentication, role-based authorization, tenant isolation, and deployment security require further implementation and independent verification.
+- **Human-in-the-loop does not imply access control.** Reviewer identity must be enforced server-side before real use.
+- **No automated coverage certification.** Findings must be evaluated by qualified personnel with authoritative documentation.
+- **Evidence limitations.** Structured inputs and recorded events do not automatically prove that a source insurance document is authentic.
+- **Demo values are illustrative.** They should never be mistaken for organization-wide operational statistics.
 
-- Use synthetic or properly de-identified data only.
-- Do not expose development API endpoints directly to the public internet.
-- Authentication, authorization, role-based access control, and deployment hardening require further implementation and testing.
-- Insurance coverage findings are not legally binding determinations.
-- Human review does not substitute for licensed professional judgment.
-- Automated test success does not constitute a security audit or production certification.
+## Roadmap
 
-## Future Improvements
-
-- Versioned policy correction and resubmission
-- Expanded reviewer case-management workflows
-- Document ingestion and source-level evidence references
-- Role-based authentication and authorization
-- Automated frontend and end-to-end testing
-- CI/CD and additional security testing
-- Deployment architecture and observability improvements
-
-## Project Status
-
-**Implemented and locally verified:** Core workflow orchestration, structured insurance coverage comparison, human review persistence, PostgreSQL-backed dashboard data, and frontend production compilation.
-
-**In development:** Broader end-to-end case management, secure production deployment, and expanded automated validation.
+- Versioned policy correction and resubmission, preserving prior findings
+- Reviewer case management and granular authorization
+- Document ingestion with verifiable provenance
+- More extensive validation, frontend tests, and end-to-end tests
+- CI, monitoring, dependency scanning, and deployment hardening
 
 ---
 
-Built as a software engineering portfolio project focused on trustworthy AI-assisted enterprise workflows.
+**Built to explore practical, evidence-first AI systems and accountable enterprise workflows.**
